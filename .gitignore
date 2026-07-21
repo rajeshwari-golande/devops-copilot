@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Environment & secrets
+.env
+.env.local
+*.pem
+secrets/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Data & runtime
+data/chroma/
+data/uploads/
+*.db
+*.sqlite3
+logs/
+*.log
+!data/sample_failures/*.log
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.local
+*.tsbuildinfo
+
+# Docker
+.docker/
+
+# OS
+Desktop.ini

@@ -1,0 +1,13 @@
+# Sample CI failure: Docker / build OOM (exit 137)
+
+#8 [builder 4/6] RUN npm run build
+#8 42.10 Killed
+#8 ERROR: process "/bin/sh -c npm run build" did not complete successfully: exit code: 137
+
+------
+ > [builder 4/6] RUN npm run build:
+42.10 Killed
+------
+ERROR: failed to solve: process "/bin/sh -c npm run build" did not complete successfully: exit code: 137
+##[error]Out of memory — container killed (OOM)
+Process completed with exit code 137.

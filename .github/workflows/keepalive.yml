@@ -1,0 +1,24 @@
+name: Keep-alive (Render free tier)
+
+# Pings /health every 10 minutes so the free Render service stays warm for demos.
+# Set repository variable RENDER_HEALTH_URL = https://your-service.onrender.com/health
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        env:
+          URL: ${{ vars.RENDER_HEALTH_URL }}
+        run: |
+          if [ -z "$URL" ]; then
+            echo "RENDER_HEALTH_URL not set — skipping (set repo variable after deploy)."
+            exit 0
+          fi
+          curl -fsS --max-time 60 "$URL" | tee /tmp/health.json
+          grep -q '"status"' /tmp/health.json

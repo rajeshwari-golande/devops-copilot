@@ -1,0 +1,14 @@
+# Sample: TypeScript compile error (needs human approval)
+
+> tsc --noEmit
+
+src/api/client.ts:42:18 - error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+
+42   fetchUser(userId);
+                    ~~~~~~
+
+Found 1 error in src/api/client.ts:42
+
+error Command failed with exit code 2.
+##[error]Process completed with exit code 2.

@@ -1,0 +1,13 @@
+# Sample CI failure: transient npm registry timeout
+# Useful for demoing safe auto-remediation (retry_workflow)
+
+npm error code ETIMEDOUT
+npm error syscall connect
+npm error errno ETIMEDOUT
+npm error network request to https://registry.npmjs.org/react failed, reason: connect ETIMEDOUT
+npm error network This is a problem related to network connectivity.
+npm error network In most cases you are behind a proxy or have bad network settings.
+npm ERR! network Temporary network failure
+
+Error: Process completed with exit code 1.
+##[error]Process completed with exit code 1.

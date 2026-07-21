@@ -1,0 +1,15 @@
+# Sample: pip dependency conflict
+
+ERROR: Cannot install -r requirements.txt (line 4) and pydantic==1.10.13 because these package versions have conflicting dependencies.
+
+The conflict is caused by:
+    The user requested pydantic==1.10.13
+    fastapi 0.115.0 depends on pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4
+    langchain 0.3.0 depends on pydantic<3.0.0,>=2.7.4
+
+To fix this you could try to:
+1. loosen the range of package versions you've specified
+2. remove package versions to allow pip to attempt to solve the dependency conflict
+
+ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/
+##[error]Process completed with exit code 1.
