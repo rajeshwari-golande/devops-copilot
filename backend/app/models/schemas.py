@@ -12,6 +12,7 @@ class HealthResponse(BaseModel):
     mock_mode: bool
     llm_ready: bool
     llm_backend: str = "mock"
+    embedding_backend: str = "hash"
     knowledge_docs: int = 0
     version: str
 

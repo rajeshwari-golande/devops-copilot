@@ -1,4 +1,4 @@
-"""Local embeddings via sentence-transformers (zero API cost)."""
+"""Local embeddings via sentence-transformers (zero API cost) with hash fallback."""
 
 from __future__ import annotations
 
@@ -6,9 +6,6 @@ import logging
 from functools import lru_cache
 
 logger = logging.getLogger(__name__)
-
-# Lightweight hash embedding used when sentence-transformers is unavailable
-# (first boot / CI without model download). Real demos use the MiniLM model.
 
 
 def _hash_embed(texts: list[str], dim: int = 384) -> list[list[float]]:
@@ -27,13 +24,22 @@ def _hash_embed(texts: list[str], dim: int = 384) -> list[list[float]]:
 class EmbeddingService:
     """Wraps sentence-transformers with a deterministic fallback."""
 
-    def __init__(self, model_name: str) -> None:
+    def __init__(self, model_name: str, backend: str = "auto") -> None:
         self.model_name = model_name
         self._model = None
         self._backend = "hash"
+        self._prefer = (backend or "auto").lower()
+
+    @property
+    def backend_name(self) -> str:
+        return self._backend if self._backend != "hash_locked" else "hash"
 
     def _load(self) -> None:
         if self._model is not None or self._backend == "hash_locked":
+            return
+        if self._prefer in {"hash", "hash_locked"}:
+            self._backend = "hash_locked"
+            logger.info("Using hash embeddings (EMBEDDING_BACKEND=hash)")
             return
         try:
             from sentence_transformers import SentenceTransformer
@@ -41,7 +47,7 @@ class EmbeddingService:
             self._model = SentenceTransformer(self.model_name)
             self._backend = "sentence-transformers"
             logger.info("Loaded embedding model: %s", self.model_name)
-        except Exception as exc:  # noqa: BLE001 — fall back for offline/CI
+        except Exception as exc:  # noqa: BLE001 — fall back for offline/CI/Docker
             logger.warning("sentence-transformers unavailable (%s); using hash embeddings", exc)
             self._backend = "hash_locked"
 
@@ -59,4 +65,5 @@ class EmbeddingService:
 def get_embedding_service() -> EmbeddingService:
     from app.config import get_settings
 
-    return EmbeddingService(get_settings().embedding_model)
+    settings = get_settings()
+    return EmbeddingService(settings.embedding_model, backend=settings.embedding_backend)

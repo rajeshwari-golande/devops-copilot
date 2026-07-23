@@ -1,0 +1,56 @@
+name: Demo diagnose (manual)
+
+# Manually trigger a sample failure diagnosis against a deployed API.
+# Set repository variable DEMO_API_URL = https://your-api.onrender.com
+
+on:
+  workflow_dispatch:
+    inputs:
+      sample:
+        description: Sample log id (without .log)
+        required: true
+        default: npm_network_timeout
+        type: choice
+        options:
+          - npm_network_timeout
+          - docker_oom
+          - pytest_import_error
+          - typescript_error
+          - missing_secret
+          - pip_conflict
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: POST sample to API
+        env:
+          API: ${{ vars.DEMO_API_URL }}
+          SAMPLE: ${{ inputs.sample }}
+        run: |
+          if [ -z "$API" ]; then
+            echo "Set repo variable DEMO_API_URL first."
+            exit 1
+          fi
+          FILE="data/sample_failures/${SAMPLE}.log"
+          python - <<'PY'
+          import json, os, pathlib, urllib.request
+          api = os.environ["API"].rstrip("/")
+          text = pathlib.Path(os.environ["FILE"] if False else os.environ.get("FILE", "")).read_text() if False else pathlib.Path(f"data/sample_failures/{os.environ['SAMPLE']}.log").read_text()
+          payload = json.dumps({
+            "repo": "demo/devops-copilot",
+            "workflow_name": "Demo diagnose",
+            "job_name": "manual",
+            "branch": "master",
+            "raw_logs": text,
+          }).encode()
+          req = urllib.request.Request(
+            f"{api}/api/v1/failures/diagnose",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+          )
+          with urllib.request.urlopen(req, timeout=120) as resp:
+            print(resp.read().decode())
+          PY

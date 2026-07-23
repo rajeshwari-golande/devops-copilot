@@ -46,10 +46,15 @@ class Settings(BaseSettings):
     slack_channel_id: str = ""
 
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    # auto | hash | sentence-transformers — use "hash" on Render free Docker
+    embedding_backend: str = "auto"
 
     @property
     def cors_origin_list(self) -> list[str]:
-        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        raw = [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        if "*" in raw:
+            return ["*"]
+        return raw
 
     @property
     def use_groq(self) -> bool:

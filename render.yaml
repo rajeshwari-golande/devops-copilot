@@ -1,4 +1,5 @@
 # Render Blueprint — free web service for DevOps Copilot API
+# Dashboard: New → Blueprint → connect rajeshwari-golande/devops-copilot
 # https://render.com/docs/blueprint-spec
 services:
   - type: web
@@ -6,11 +7,19 @@ services:
     runtime: docker
     plan: free
     healthCheckPath: /health
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
     envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
       - key: MOCK_MODE
         value: "true"
       - key: AUTO_SEED_KNOWLEDGE
         value: "true"
+      - key: EMBEDDING_BACKEND
+        value: hash
       - key: DATABASE_URL
         value: sqlite+aiosqlite:////app/data/devops_copilot.db
       - key: CHROMA_PERSIST_DIR
@@ -22,6 +31,10 @@ services:
       - key: GITHUB_WEBHOOK_SECRET
         sync: false
       - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_REPO_OWNER
+        sync: false
+      - key: GITHUB_REPO_NAME
         sync: false
       - key: SLACK_BOT_TOKEN
         sync: false

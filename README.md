@@ -112,16 +112,17 @@ docker compose up --build
 
 ## Free-tier deploy notes
 
+See **[DEPLOY.md](./DEPLOY.md)** for the full checklist (Render API + Vercel UI + webhook + Groq).
+
 | Piece | Suggested free host | Config in repo |
 |---|---|---|
-| API | Render free | `render.yaml` + `Dockerfile` |
+| API | Render free | `render.yaml` + slim `Dockerfile` |
 | Frontend | Vercel | `frontend/vercel.json` |
-| Keep-alive | GitHub Actions cron every 10 min | `.github/workflows/keepalive.yml` (set `RENDER_HEALTH_URL`) |
-| Postgres | Neon free (or keep SQLite for local) | `DATABASE_URL` |
+| Keep-alive | GitHub Actions cron every 10 min | `.github/workflows/keepalive.yml` |
+| Manual remote demo | GitHub Actions | `.github/workflows/demo-diagnose.yml` |
+| Postgres | Neon free (or SQLite on Render disk) | `DATABASE_URL` |
 | LLM | Groq free / Ollama local | `.env` |
-| Vector DB | Chroma self-hosted on the API disk | auto-seeded on boot |
-| Images | GHCR | — |
-| CI | GitHub Actions | `.github/workflows/ci.yml` |
+| Vector DB | Chroma (hash embeddings on free Docker) | auto-seeded on boot |
 
 ## Interview talking points
 
