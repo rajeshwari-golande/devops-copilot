@@ -1,5 +1,25 @@
 # Finish DevOps Copilot — deploy + live demo checklist
 
+## Live URLs (current)
+
+| Piece | URL |
+|---|---|
+| **Frontend (demo)** | https://devops-copilot-three.vercel.app |
+| **API** | https://devops-copilot-l1r8.onrender.com |
+| **API health** | https://devops-copilot-l1r8.onrender.com/health |
+| **API docs** | https://devops-copilot-l1r8.onrender.com/docs |
+| **GitHub** | https://github.com/rajeshwari-golande/devops-copilot |
+
+### Keep-alive (recommended before interviews)
+
+1. Repo → **Settings** → **Secrets and variables** → **Actions** → **Variables**
+2. Add `RENDER_HEALTH_URL` = `https://devops-copilot-l1r8.onrender.com/health`
+3. Optional: add `DEMO_API_URL` = `https://devops-copilot-l1r8.onrender.com`
+
+The workflow `.github/workflows/keepalive.yml` pings every 10 minutes so Render free tier stays warm.
+
+---
+
 This gets you an interview-ready live demo on free tiers.
 
 ## 0) Accounts (all free)
