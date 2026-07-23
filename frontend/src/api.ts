@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+const API_BASE =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, "") ||
+  (import.meta.env.PROD ? "https://devops-copilot-l1r8.onrender.com" : "");
 
 export type Failure = {
   id: number;
