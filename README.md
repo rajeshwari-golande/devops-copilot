@@ -4,6 +4,19 @@ AI agent for **CI/CD failure diagnosis and safe auto-remediation**.
 
 Built as a free-tier-deployable portfolio project: FastAPI + LangGraph + Groq + ChromaDB RAG + React.
 
+## Live demo
+
+| Piece | URL |
+|---|---|
+| **Frontend (use this for demos)** | https://devops-copilot-three.vercel.app |
+| **API** | https://devops-copilot-l1r8.onrender.com |
+| **API health** | https://devops-copilot-l1r8.onrender.com/health |
+| **API docs (Swagger)** | https://devops-copilot-l1r8.onrender.com/docs |
+
+Note: opening the API root (`/`) only returns a small JSON pointer (`docs` / `health`). Use the **frontend** link above for the interview demo, or `/docs` / `/health` for the API.
+
+Full deploy checklist: [DEPLOY.md](./DEPLOY.md)
+
 ## What it does
 
 1. Ingests GitHub Actions failure webhooks (or manual log paste)
