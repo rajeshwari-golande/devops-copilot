@@ -65,6 +65,8 @@ class FailureOut(BaseModel):
     auto_applied: bool
     similar_cases: list[dict[str, Any]] | dict[str, Any] | None
     agent_reasoning: str | None
+    outcome_conclusion: str | None = None
+    circuit_blocked: bool = False
     created_at: datetime | None
 
     model_config = {"from_attributes": True}
@@ -95,5 +97,9 @@ class DashboardStats(BaseModel):
     awaiting_approval: int
     feedback_count: int
     accuracy_estimate: float | None
+    # From labeled eval harness (data/eval/latest_results.json), when present
+    eval_accuracy: float | None = None
+    eval_headline: str | None = None
+    eval_n_cases: int | None = None
     by_classification: dict[str, int]
     recent_failures: list[FailureOut]

@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "description": "Ground-truth evaluation set for DevOps Copilot. Labels are known root-cause classes for held-out CI failure logs (sample packs + intentional-break patterns). Expand with fetch_public_failures.py output.",
+  "taxonomy_sources": [
+    "Google SRE Book (sre.google/books)",
+    "GitLab public incident / postmortem practice",
+    "Flaky-test research (e.g. iDFlakies-style categories)"
+  ],
+  "cases": [
+    {
+      "id": "npm_network_timeout",
+      "source": "intentional_sample",
+      "log_file": "data/sample_failures/npm_network_timeout.log",
+      "expected_classification": "transient_network",
+      "expected_action": "retry_workflow",
+      "true_root_cause": "Transient timeout reaching npm registry"
+    },
+    {
+      "id": "docker_oom",
+      "source": "intentional_sample",
+      "log_file": "data/sample_failures/docker_oom.log",
+      "expected_classification": "resource_exhaustion",
+      "expected_action": "clear_cache",
+      "true_root_cause": "Build OOM-killed with exit code 137"
+    },
+    {
+      "id": "pytest_import_error",
+      "source": "intentional_sample",
+      "log_file": "data/sample_failures/pytest_import_error.log",
+      "expected_classification": "test_failure",
+      "expected_action": "none",
+      "true_root_cause": "PYTHONPATH / missing app package during pytest collection"
+    },
+    {
+      "id": "typescript_error",
+      "source": "intentional_sample",
+      "log_file": "data/sample_failures/typescript_error.log",
+      "expected_classification": "compile_error",
+      "expected_action": "none",
+      "true_root_cause": "TS2345 type error — string | undefined passed as string"
+    },
+    {
+      "id": "missing_secret",
+      "source": "intentional_sample",
+      "log_file": "data/sample_failures/missing_secret.log",
+      "expected_classification": "misconfiguration",
+      "expected_action": "none",
+      "true_root_cause": "Required Actions secret GROQ_API_KEY not configured"
+    },
+    {
+      "id": "pip_conflict",
+      "source": "intentional_sample",
+      "log_file": "data/sample_failures/pip_conflict.log",
+      "expected_classification": "dependency_conflict",
+      "expected_action": "pin_dependency",
+      "true_root_cause": "Conflicting pydantic v1 vs v2 pins (ResolutionImpossible)"
+    },
+    {
+      "id": "flaky_race_sleep",
+      "source": "intentional_pattern",
+      "inline_log": "FAILED tests/test_async_race.py::test_order - AssertionError: expected 2 got 1\n=========================== short test summary info ===========================\nFAILED tests/test_async_race.py::test_order - intermittent under load\nRe-run sometimes passes. Race on shared list without lock.\n##[error]Process completed with exit code 1.",
+      "expected_classification": "flaky_test",
+      "expected_action": "retry_workflow",
+      "true_root_cause": "Non-deterministic race in async test"
+    },
+    {
+      "id": "permission_denied_token",
+      "source": "intentional_pattern",
+      "inline_log": "Error: Resource not accessible by integration\nHttpError: GET https://api.github.com/repos/org/app/actions/runs - 403\nGITHUB_TOKEN lacks actions:read / contents:write permission.\n##[error]Process completed with exit code 1.",
+      "expected_classification": "permissions",
+      "expected_action": "none",
+      "true_root_cause": "Workflow token missing required permissions"
+    },
+    {
+      "id": "npm_lockfile_drift",
+      "source": "intentional_pattern",
+      "inline_log": "npm ERR! `npm ci` can only install packages when your package.json and package-lock.json are in sync.\nnpm ERR! Invalid: lock file's react@18.2.0 does not satisfy react@18.3.1\nError: Process completed with exit code 1.",
+      "expected_classification": "dependency_conflict",
+      "expected_action": "none",
+      "true_root_cause": "package-lock.json out of sync with package.json"
+    },
+    {
+      "id": "pypi_timeout",
+      "source": "intentional_pattern",
+      "inline_log": "WARNING: Retrying (Retry(total=2, connect=None, read=None)) after connection broken by 'ConnectTimeoutError'\nERROR: Could not install packages due to an OSError: [Errno 110] Connection timed out\nFailed to fetch https://pypi.org/simple/numpy/\n##[error]Process completed with exit code 1.",
+      "expected_classification": "transient_network",
+      "expected_action": "retry_workflow",
+      "true_root_cause": "Transient timeout fetching from PyPI"
+    }
+  ]
+}

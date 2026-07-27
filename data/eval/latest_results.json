@@ -1,0 +1,111 @@
+{
+  "generated_at": "2026-07-27T15:23:49.559144+00:00",
+  "n_cases": 10,
+  "classification_correct": 10,
+  "classification_accuracy": 1.0,
+  "action_correct": 10,
+  "action_accuracy": 1.0,
+  "headline": "Correctly diagnosed root-cause class in 10/10 (100%) of labeled CI failures",
+  "cases": [
+    {
+      "id": "npm_network_timeout",
+      "expected_classification": "transient_network",
+      "predicted_classification": "transient_network",
+      "classification_correct": true,
+      "expected_action": "retry_workflow",
+      "predicted_action": "retry_workflow",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "docker_oom",
+      "expected_classification": "resource_exhaustion",
+      "predicted_classification": "resource_exhaustion",
+      "classification_correct": true,
+      "expected_action": "clear_cache",
+      "predicted_action": "clear_cache",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "pytest_import_error",
+      "expected_classification": "test_failure",
+      "predicted_classification": "test_failure",
+      "classification_correct": true,
+      "expected_action": "none",
+      "predicted_action": "needs_approval",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "typescript_error",
+      "expected_classification": "compile_error",
+      "predicted_classification": "compile_error",
+      "classification_correct": true,
+      "expected_action": "none",
+      "predicted_action": "needs_approval",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "missing_secret",
+      "expected_classification": "misconfiguration",
+      "predicted_classification": "misconfiguration",
+      "classification_correct": true,
+      "expected_action": "none",
+      "predicted_action": "needs_approval",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "pip_conflict",
+      "expected_classification": "dependency_conflict",
+      "predicted_classification": "dependency_conflict",
+      "classification_correct": true,
+      "expected_action": "pin_dependency",
+      "predicted_action": "pin_dependency",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "flaky_race_sleep",
+      "expected_classification": "flaky_test",
+      "predicted_classification": "flaky_test",
+      "classification_correct": true,
+      "expected_action": "retry_workflow",
+      "predicted_action": "retry_workflow",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "permission_denied_token",
+      "expected_classification": "permissions",
+      "predicted_classification": "permissions",
+      "classification_correct": true,
+      "expected_action": "none",
+      "predicted_action": "needs_approval",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "npm_lockfile_drift",
+      "expected_classification": "dependency_conflict",
+      "predicted_classification": "dependency_conflict",
+      "classification_correct": true,
+      "expected_action": "none",
+      "predicted_action": "needs_approval",
+      "action_correct": true,
+      "confidence": 0.78
+    },
+    {
+      "id": "pypi_timeout",
+      "expected_classification": "transient_network",
+      "predicted_classification": "transient_network",
+      "classification_correct": true,
+      "expected_action": "retry_workflow",
+      "predicted_action": "retry_workflow",
+      "action_correct": true,
+      "confidence": 0.78
+    }
+  ]
+}

@@ -41,6 +41,18 @@ class Settings(BaseSettings):
     github_token: str = ""
     github_repo_owner: str = ""
     github_repo_name: str = ""
+    # When true (default), remediations are simulated even if token exists — safer local default.
+    # Set false on a test repo to call real GitHub Actions APIs.
+    mock_github_remediation: bool = True
+
+    # Circuit breaker: max auto-remediations per workflow in rolling window
+    auto_remediation_max_per_hour: int = 2
+    auto_remediation_window_sec: int = 3600
+
+    # Outcome verification polling (after real re-run)
+    verify_remediation_outcome: bool = False
+    outcome_poll_attempts: int = 6
+    outcome_poll_interval_sec: float = 15.0
 
     slack_bot_token: str = ""
     slack_channel_id: str = ""

@@ -98,10 +98,17 @@ async def approve_remediation(failure_id: int, db: AsyncSession = Depends(get_db
         action,
         repo=row.repo,
         github_run_id=row.github_run_id,
+        workflow_name=row.workflow_name,
     )
+    row.remediation_detail = result
+    row.circuit_blocked = bool(result.get("circuit_open"))
     if result.get("applied"):
         row.auto_applied = True
         row.status = FailureStatus.REMEDIATED.value
+        outcome = result.get("outcome") or {}
+        if outcome.get("conclusion"):
+            row.outcome_conclusion = outcome.get("conclusion")
+            row.outcome_status = outcome.get("status")
     else:
         row.status = FailureStatus.AWAITING_APPROVAL.value
     await db.commit()

@@ -61,25 +61,16 @@ def _normalize_diagnosis(data: dict[str, Any], similar: list[dict[str, Any]], so
 def _heuristic_diagnosis(logs: str, similar: list[dict[str, Any]]) -> dict[str, Any]:
     """Rule + RAG fallback when Groq/Ollama is unavailable (MOCK_MODE / no key)."""
     lower = logs.lower()
-    if similar:
-        best = similar[0]
-        meta = best.get("metadata") or {}
-        action = meta.get("safe_action") or "none"
-        return {
-            "classification": meta.get("classification", "unknown"),
-            "root_cause": meta.get("root_cause", "Matched historical failure pattern"),
-            "suggested_fix": meta.get("fix", "Review similar cases and apply the known fix"),
-            "confidence": max(0.55, 1.0 - float(best.get("distance") or 0.4)),
-            "remediation_action": action if action in SAFE_ACTIONS else "needs_approval",
-            "auto_apply_safe": action in SAFE_ACTIONS,
-            "agent_reasoning": (
-                "[rag+heuristic] Retrieved nearest Chroma neighbor and mapped its known fix. "
-                "Set GROQ_API_KEY + MOCK_MODE=false (or PREFER_OLLAMA=true) for LLM diagnosis."
-            ),
-            "similar_cases": similar,
-        }
 
+    # Prefer high-signal regexes first so eval/demo stay stable under weak embeddings.
     patterns = [
+        (
+            r"intermittent|flaky|race condition|sometimes passes|non-?deterministic",
+            "flaky_test",
+            "Non-deterministic / flaky test failure",
+            "Re-run the workflow; quarantine or fix the race",
+            "retry_workflow",
+        ),
         (
             r"package-lock\.json|npm ci",
             "dependency_conflict",
@@ -88,7 +79,7 @@ def _heuristic_diagnosis(logs: str, similar: list[dict[str, Any]]) -> dict[str, 
             "none",
         ),
         (
-            r"etimedout|temporary failure|econnreset",
+            r"etimedout|temporary failure|econnreset|connection timed out|connecttimeouterror",
             "transient_network",
             "Transient network / registry timeout",
             "Re-run the workflow; add retries for registry fetches",
@@ -116,6 +107,13 @@ def _heuristic_diagnosis(logs: str, similar: list[dict[str, Any]]) -> dict[str, 
             "none",
         ),
         (
+            r"resource not accessible|lacks .*permission|403.*actions",
+            "permissions",
+            "Workflow token permissions are insufficient",
+            "Grant the needed permissions in the workflow permissions block",
+            "none",
+        ),
+        (
             r"ts\d{4}|typescript",
             "compile_error",
             "TypeScript compile/type error",
@@ -136,10 +134,31 @@ def _heuristic_diagnosis(logs: str, similar: list[dict[str, Any]]) -> dict[str, 
                 "classification": classification,
                 "root_cause": cause,
                 "suggested_fix": fix,
-                "confidence": 0.7,
+                "confidence": 0.78,
                 "remediation_action": action if action in SAFE_ACTIONS else "needs_approval",
                 "auto_apply_safe": action in SAFE_ACTIONS,
                 "agent_reasoning": f"[heuristic] Regex match on pattern `{pattern}`.",
+                "similar_cases": similar,
+            }
+
+    # RAG neighbor only when no strong regex hit and distance looks usable
+    if similar:
+        best = similar[0]
+        dist = best.get("distance")
+        if dist is None or float(dist) <= 0.55:
+            meta = best.get("metadata") or {}
+            action = meta.get("safe_action") or "none"
+            return {
+                "classification": meta.get("classification", "unknown"),
+                "root_cause": meta.get("root_cause", "Matched historical failure pattern"),
+                "suggested_fix": meta.get("fix", "Review similar cases and apply the known fix"),
+                "confidence": max(0.55, 1.0 - float(dist or 0.4)),
+                "remediation_action": action if action in SAFE_ACTIONS else "needs_approval",
+                "auto_apply_safe": action in SAFE_ACTIONS,
+                "agent_reasoning": (
+                    "[rag+heuristic] Retrieved nearest Chroma neighbor and mapped its known fix. "
+                    "Set GROQ_API_KEY + MOCK_MODE=false (or PREFER_OLLAMA=true) for LLM diagnosis."
+                ),
                 "similar_cases": similar,
             }
 
@@ -150,7 +169,7 @@ def _heuristic_diagnosis(logs: str, similar: list[dict[str, Any]]) -> dict[str, 
         "confidence": 0.3,
         "remediation_action": "needs_approval",
         "auto_apply_safe": False,
-        "agent_reasoning": "[heuristic] No RAG hit and no pattern matched.",
+        "agent_reasoning": "[heuristic] No strong pattern and no close RAG neighbor.",
         "similar_cases": similar,
     }
 
@@ -272,12 +291,19 @@ def get_graph():
 
 def run_diagnosis(logs: str) -> dict[str, Any]:
     """Public entry: retrieve similar cases → diagnose → return structured result."""
+    from app.taxonomy import normalize_classification
+
     graph = get_graph()
     initial: AgentState = {"logs": logs}
     if graph is not None:
         final = graph.invoke(initial)
-        return final.get("diagnosis") or _heuristic_diagnosis(logs, final.get("similar_cases") or [])
+        diagnosis = final.get("diagnosis") or _heuristic_diagnosis(
+            logs, final.get("similar_cases") or []
+        )
+    else:
+        mid = retrieve_node(initial)
+        final = diagnose_node(mid)
+        diagnosis = final["diagnosis"]
 
-    mid = retrieve_node(initial)
-    final = diagnose_node(mid)
-    return final["diagnosis"]
+    diagnosis["classification"] = normalize_classification(diagnosis.get("classification"))
+    return diagnosis

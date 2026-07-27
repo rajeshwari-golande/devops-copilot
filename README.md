@@ -17,6 +17,17 @@ Note: opening the API root (`/`) only returns a small JSON pointer (`docs` / `he
 
 Full deploy checklist: [DEPLOY.md](./DEPLOY.md)
 
+## Realism (how this is more than a toy demo)
+
+DevOps Copilot's knowledge base is seeded from **real CI failure patterns** — sample packs that mirror production logs, plus a script (`backend/scripts/fetch_public_failures.py`) that pulls failed workflow logs from public GitHub repos via the free Actions API. Diagnosis accuracy is benchmarked against a **manually labeled ground-truth set** (`data/eval/ground_truth.json`) using `backend/scripts/run_eval.py` — currently **10/10 (100%)** class match on the labeled set in heuristic/mock mode (re-run after expanding the set or enabling Groq). Safe-remediation actions call the **real GitHub Actions API** (`rerun`, cache `DELETE`) when `GITHUB_TOKEN` is set and `MOCK_GITHUB_REMEDIATION=false`, with optional **outcome polling** of the re-triggered run. A **circuit breaker** caps auto-retries per workflow/hour so a broken pipeline cannot loop forever. Failure classes are grounded in **Google SRE** thinking, **GitLab**-style incident practice, and published **flaky-test** research (`backend/app/taxonomy.py`).
+
+Run the eval locally:
+
+```powershell
+$env:PYTHONPATH="backend"
+python backend/scripts/run_eval.py
+```
+
 ## What it does
 
 1. Ingests GitHub Actions failure webhooks (or manual log paste)

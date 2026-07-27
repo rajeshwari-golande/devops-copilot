@@ -26,6 +26,9 @@ export type DashboardStats = {
   awaiting_approval: number;
   feedback_count: number;
   accuracy_estimate: number | null;
+  eval_accuracy?: number | null;
+  eval_headline?: string | null;
+  eval_n_cases?: number | null;
   by_classification: Record<string, number>;
   recent_failures: Failure[];
 };

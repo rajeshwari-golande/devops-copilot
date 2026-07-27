@@ -194,6 +194,11 @@ export default function App() {
               accent="text-warn"
             />
           </div>
+          {stats?.eval_headline && (
+            <p className="animate-rise font-mono text-xs text-mist" style={{ animationDelay: "40ms" }}>
+              Eval: {stats.eval_headline}
+            </p>
+          )}
 
           <form onSubmit={onDiagnose} className="animate-rise space-y-4" style={{ animationDelay: "80ms" }}>
             <div className="flex flex-wrap items-end justify-between gap-4">

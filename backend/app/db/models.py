@@ -52,6 +52,10 @@ class PipelineFailure(Base):
     auto_applied: Mapped[bool] = mapped_column(Boolean, default=False)
     similar_cases: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
     agent_reasoning: Mapped[str | None] = mapped_column(Text, nullable=True)
+    remediation_detail: Mapped[dict | list | None] = mapped_column(JSON, nullable=True)
+    outcome_status: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    outcome_conclusion: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    circuit_blocked: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
